@@ -1,0 +1,199 @@
+openapi: 3.0.0
+info:
+  title: MIMIR API
+  version: 0.1.0
+  description: The API documentation for the MIMIR game network.
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/mit-license.php'
+tags:
+  - name: player
+  - name: game
+  - name: session
+paths:
+  /players:
+    get:
+      operationId: List players
+      tags:
+        - player
+      responses:
+        '200':
+          description: List of players.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    post:
+      operationId: Create player*
+      tags:
+        - player
+      responses:
+        '201':
+          description: Player created.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+        '409':
+          description: Player displayName not available or already registered.
+  '/players/{playerId}':
+    parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: number
+    get:
+      operationId: Get player details
+      tags:
+        - player
+      responses:
+        '200':
+          description: Player details.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    put:
+      operationId: Update player
+      tags:
+        - player
+      responses:
+        '204':
+          description: Player updated.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+        '409':
+          description: displayName already in use.
+  /games:
+    get:
+      operationId: List games
+      tags:
+        - game
+      responses:
+        '200':
+          description: List of games.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    post:
+      operationId: Create game
+      tags:
+        - game
+      responses:
+        '201':
+          description: Game created.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+        '409':
+          description: Game already in database.
+  '/games/{gameId}':
+    parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: number
+    get:
+      operationId: Get game details
+      tags:
+        - game
+      responses:
+        '200':
+          description: Game details.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    put:
+      operationId: Update game
+      tags:
+        - game
+      responses:
+        '204':
+          description: Game updated.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+        '409':
+          description: Game name conflicting with another game.
+    delete:
+      operationId: Delete game
+      tags:
+        - game
+      responses:
+        '204':
+          description: Game deleted.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  /sessions:
+    get:
+      operationId: List sessions
+      tags:
+        - session
+      responses:
+        '200':
+          description: List of sessions.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    post:
+      operationId: Create session
+      tags:
+        - session
+      responses:
+        '201':
+          description: Session created.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  '/sessions/{sessionId}':
+    parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: number
+    get:
+      operationId: Get session details
+      tags:
+        - game
+      responses:
+        '200':
+          description: Session details.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    put:
+      operationId: Update session
+      tags:
+        - session
+      responses:
+        '204':
+          description: Session updated.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    delete:
+      operationId: Delete session
+      tags:
+        - session
+      responses:
+        '204':
+          description: Session deleted.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
