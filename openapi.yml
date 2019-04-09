@@ -7,8 +7,9 @@ info:
     name: MIT
     url: 'https://opensource.org/licenses/mit-license.php'
 tags:
-  - name: player
   - name: game
+  - name: invitation
+  - name: player
   - name: session
 components:
   schemas:
@@ -195,6 +196,32 @@ paths:
           description: Invalid authentication or missing authorization.
         '409':
           description: displayName already in use.
+  '/players/{playerId}/invitations':
+    parameters:
+      - name: playerId
+        in: path
+        required: true
+        schema:
+          type: number
+    get:
+      operationId: Get invitation of player
+      description: >-
+        Return the list of invitation related to coming sessions for a player.
+      tags:
+        - invitation
+      responses:
+        '200':
+          description: List of invitations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invitation'
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
   '/players/{playerId}/archive-status':
     parameters:
       - name: playerId
@@ -364,6 +391,48 @@ paths:
       responses:
         '204':
           description: Session deleted.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  '/invitations/{invitationId}':
+    parameters:
+      - name: invitationId
+        in: path
+        required: true
+        schema:
+          type: number
+    get:
+      operationId: Get invitation
+      tags:
+        - invitation
+      responses:
+        '200':
+          description: Invitation details
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    put:
+      operationId: Update invitation
+      summary: Respond to an invitation
+      tags:
+        - invitation
+      responses:
+        '204':
+          description: Invitation updated with response
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    delete:
+      operationId: Delete invitation
+      description: Creator of invitation only.
+      tags:
+        - invitation
+      responses:
+        '204':
+          description: Invitation deleted.
         '401':
           description: Missing authentication.
         '403':
