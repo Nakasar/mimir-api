@@ -10,8 +10,77 @@ tags:
   - name: player
   - name: game
   - name: session
+components:
+  schemas:
+    GameSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        summary:
+          type: string
+        thumbnail:
+          type: string
+        note:
+          type: number
+    GameDetails:
+      allOf:
+        - $ref: "#/components/schemas/GameSummary"
+        - type: object
+          properties:
+            description:
+              type: string
+            notes:
+              type: array
+              items:
+                type: object
+            prices:
+              type: array
+              items:
+                type: object
+            website:
+              type: string
+    PlayerSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+    PlayerUpdate:
+      type: object
+      properties:
+        displayName:
+          type: string
+    SessionSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        date:
+          type: string
+        location:
+          type: string
+        status:
+          type: string
+          enum: ['DRAFT', 'PROPOSED', 'CONFIRMED', 'CANCELLED', 'PAST']
+        description:
+          type: string
+        participants:
+          type: number
+    SessionDetails:
+      allOf:
+        - $ref: "#/components/schemas/SessionSummary"
+        - type: object
+          properties:
+            invitations:
+              type: object
 paths:
-  /players:
+  '/players':
     get:
       operationId: List players
       tags:
@@ -19,6 +88,12 @@ paths:
       responses:
         '200':
           description: List of players.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerSummary'
         '401':
           description: Missing authentication.
         '403':
@@ -58,6 +133,13 @@ paths:
       operationId: Update player
       tags:
         - player
+      requestBody:
+        description: Update data for player
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlayerUpdate"
       responses:
         '204':
           description: Player updated.
@@ -67,7 +149,26 @@ paths:
           description: Invalid authentication or missing authorization.
         '409':
           description: displayName already in use.
-  /games:
+  '/players/{playerId}/archive-status':
+    parameters:
+      - name: playerId
+        in: path
+        required: true
+        schema:
+          type: number
+    put:
+      operationId: Archive player
+      description: Archive or ban a player.
+      tags:
+        - player
+      responses:
+        '204':
+          description: Player archive status updated.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  '/games':
     get:
       operationId: List games
       tags:
@@ -75,6 +176,12 @@ paths:
       responses:
         '200':
           description: List of games.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameSummary"
         '401':
           description: Missing authentication.
         '403':
@@ -106,6 +213,12 @@ paths:
       responses:
         '200':
           description: Game details.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameDetails"
         '401':
           description: Missing authentication.
         '403':
@@ -134,7 +247,7 @@ paths:
           description: Missing authentication.
         '403':
           description: Invalid authentication or missing authorization.
-  /sessions:
+  '/sessions':
     get:
       operationId: List sessions
       tags:
@@ -142,6 +255,12 @@ paths:
       responses:
         '200':
           description: List of sessions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SessionSummary"
         '401':
           description: Missing authentication.
         '403':
@@ -171,6 +290,12 @@ paths:
       responses:
         '200':
           description: Session details.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SessionDetails"
         '401':
           description: Missing authentication.
         '403':
