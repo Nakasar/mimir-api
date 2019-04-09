@@ -35,13 +35,42 @@ components:
             notes:
               type: array
               items:
-                type: object
+                $ref: "#/components/schemas/Note"
             prices:
               type: array
               items:
-                type: object
+                $ref: "#/components/schemas/Price"
             website:
               type: string
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: string
+        player:
+          type: string
+        session:
+          type: string
+        sentOn:
+          type: string
+          format: date
+        respondedOn:
+          type: string
+          format: date
+        response:
+          type: string
+          enum: ['PENDING', 'MAYBE', 'CONFIRMED', 'DECLINED']
+    Note:
+      type: object
+      properties:
+        id:
+          type: string
+        game:
+          type: string
+        player:
+          type: string
+        note:
+          type: number
     PlayerSummary:
       type: object
       properties:
@@ -53,6 +82,21 @@ components:
       type: object
       properties:
         displayName:
+          type: string
+    Price:
+      type: object
+      properties:
+        id:
+          type: string
+        game:
+          type: string
+        player:
+          type: string
+        price:
+          type: number
+        url:
+          type: string
+        description:
           type: string
     SessionSummary:
       type: object
@@ -78,7 +122,9 @@ components:
         - type: object
           properties:
             invitations:
-              type: object
+              type: array
+              items:
+                $ref: "#/components/schemas/Invitation"
 paths:
   '/players':
     get:
