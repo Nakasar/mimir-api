@@ -1,0 +1,471 @@
+openapi: 3.0.0
+info:
+  title: MIMIR API
+  version: 0.1.0
+  description: The API documentation for the MIMIR game network.
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/mit-license.php'
+servers:
+  - url: 'api.mimir.nakasar.me'
+    description: 'Production server'
+  - url: 'http://localhost{port}'
+    variables:
+      port:
+        default: ':5010'
+        description: 'Port for development server, leave blank for 80'
+    description: 'Local development server'
+tags:
+  - name: game
+  - name: invitation
+  - name: player
+  - name: session
+components:
+  x-enums:
+    InvitationResponseStatus:
+      type: string
+      enum: ['PENDING', 'MAYBE', 'CONFIRMED', 'DECLINED']
+    SessionStatus:
+      type: string
+      enum: ['DRAFT', 'PROPOSED', 'CONFIRMED', 'CANCELLED', 'PAST']
+  schemas:
+    GameSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        summary:
+          type: string
+        thumbnail:
+          type: string
+        note:
+          type: number
+    GameDetails:
+      allOf:
+        - $ref: "#/components/schemas/GameSummary"
+        - type: object
+          properties:
+            description:
+              type: string
+            notes:
+              type: array
+              items:
+                $ref: "#/components/schemas/Note"
+            prices:
+              type: array
+              items:
+                $ref: "#/components/schemas/Price"
+            website:
+              type: string
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: string
+        player:
+          type: string
+        session:
+          type: string
+        sentOn:
+          type: string
+          format: date
+        respondedOn:
+          type: string
+          format: date
+        response:
+          $ref: "#/components/x-enums/InvitationResponseStatus"
+        comment:
+          type: string
+    Note:
+      type: object
+      properties:
+        id:
+          type: string
+        game:
+          type: string
+        player:
+          type: string
+        note:
+          type: number
+    PlayerSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+    PlayerUpdate:
+      type: object
+      properties:
+        displayName:
+          type: string
+    Price:
+      type: object
+      properties:
+        id:
+          type: string
+        game:
+          type: string
+        player:
+          type: string
+        price:
+          type: number
+        url:
+          type: string
+        description:
+          type: string
+    SessionSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        date:
+          type: string
+        location:
+          type: string
+        status:
+          $ref: "#/components/x-enums/SessionStatus"
+        description:
+          type: string
+        participants:
+          type: number
+    SessionDetails:
+      allOf:
+        - $ref: "#/components/schemas/SessionSummary"
+        - type: object
+          properties:
+            invitations:
+              type: array
+              items:
+                $ref: "#/components/schemas/Invitation"
+paths:
+  '/players':
+    get:
+      operationId: List players
+      tags:
+        - player
+      responses:
+        '200':
+          description: List of players.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerSummary'
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    post:
+      operationId: Create player*
+      tags:
+        - player
+      responses:
+        '201':
+          description: Player created.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+        '409':
+          description: Player displayName not available or already registered.
+  '/players/{playerId}':
+    parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: number
+    get:
+      operationId: Get player details
+      tags:
+        - player
+      responses:
+        '200':
+          description: Player details.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    put:
+      operationId: Update player
+      tags:
+        - player
+      requestBody:
+        description: Update data for player
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlayerUpdate"
+      responses:
+        '204':
+          description: Player updated.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+        '409':
+          description: displayName already in use.
+  '/players/{playerId}/invitations':
+    parameters:
+      - name: playerId
+        in: path
+        required: true
+        schema:
+          type: number
+    get:
+      operationId: Get invitation of player
+      description: >-
+        Return the list of invitation related to coming sessions for a player.
+      tags:
+        - invitation
+      responses:
+        '200':
+          description: List of invitations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invitation'
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  '/players/{playerId}/archive-status':
+    parameters:
+      - name: playerId
+        in: path
+        required: true
+        schema:
+          type: number
+    put:
+      operationId: Archive player
+      description: Archive or ban a player.
+      tags:
+        - player
+      responses:
+        '204':
+          description: Player archive status updated.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  '/games':
+    get:
+      operationId: List games
+      tags:
+        - game
+      responses:
+        '200':
+          description: List of games.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameSummary"
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    post:
+      operationId: Create game
+      tags:
+        - game
+      responses:
+        '201':
+          description: Game created.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+        '409':
+          description: Game already in database.
+  '/games/{gameId}':
+    parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: number
+    get:
+      operationId: Get game details
+      tags:
+        - game
+      responses:
+        '200':
+          description: Game details.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameDetails"
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    put:
+      operationId: Update game
+      tags:
+        - game
+      responses:
+        '204':
+          description: Game updated.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+        '409':
+          description: Game name conflicting with another game.
+    delete:
+      operationId: Delete game
+      tags:
+        - game
+      responses:
+        '204':
+          description: Game deleted.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  '/sessions':
+    get:
+      operationId: List sessions
+      tags:
+        - session
+      responses:
+        '200':
+          description: List of sessions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SessionSummary"
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    post:
+      operationId: Create session
+      tags:
+        - session
+      responses:
+        '201':
+          description: Session created.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  '/sessions/{sessionId}':
+    parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: number
+    get:
+      operationId: Get session details
+      tags:
+        - session
+      responses:
+        '200':
+          description: Session details.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SessionDetails"
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    put:
+      operationId: Update session
+      tags:
+        - session
+      responses:
+        '204':
+          description: Session updated.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    delete:
+      operationId: Delete session
+      tags:
+        - session
+      responses:
+        '204':
+          description: Session deleted.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+  '/invitations/{invitationId}':
+    parameters:
+      - name: invitationId
+        in: path
+        required: true
+        schema:
+          type: number
+    get:
+      operationId: Get invitation
+      tags:
+        - invitation
+      responses:
+        '200':
+          description: Invitation details
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    put:
+      operationId: Update invitation
+      summary: Respond or update response to an invitation
+      tags:
+        - invitation
+      parameters:
+        - name: response
+          in: query
+          schema:
+            $ref: "#/components/x-enums/InvitationResponseStatus"
+      requestBody:
+        description: Update information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                response:
+                  $ref: "#/components/schemas/Invitation/properties/response"
+                comment:
+                  $ref: "#/components/schemas/Invitation/properties/comment"
+      responses:
+        '204':
+          description: Invitation updated with response
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
+    delete:
+      operationId: Delete invitation
+      description: Creator of invitation only.
+      tags:
+        - invitation
+      responses:
+        '204':
+          description: Invitation deleted.
+        '401':
+          description: Missing authentication.
+        '403':
+          description: Invalid authentication or missing authorization.
