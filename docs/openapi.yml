@@ -6,12 +6,28 @@ info:
   license:
     name: MIT
     url: 'https://opensource.org/licenses/mit-license.php'
+servers:
+  - url: 'api.mimir.nakasar.me'
+    description: 'Production server'
+  - url: 'http://localhost{port}'
+    variables:
+      port:
+        default: ':5010'
+        description: 'Port for development server, leave blank for 80'
+    description: 'Local development server'
 tags:
   - name: game
   - name: invitation
   - name: player
   - name: session
 components:
+  x-enums:
+    InvitationResponseStatus:
+      type: string
+      enum: ['PENDING', 'MAYBE', 'CONFIRMED', 'DECLINED']
+    SessionStatus:
+      type: string
+      enum: ['DRAFT', 'PROPOSED', 'CONFIRMED', 'CANCELLED', 'PAST']
   schemas:
     GameSummary:
       type: object
@@ -59,8 +75,9 @@ components:
           type: string
           format: date
         response:
+          $ref: "#/components/x-enums/InvitationResponseStatus"
+        comment:
           type: string
-          enum: ['PENDING', 'MAYBE', 'CONFIRMED', 'DECLINED']
     Note:
       type: object
       properties:
@@ -111,8 +128,7 @@ components:
         location:
           type: string
         status:
-          type: string
-          enum: ['DRAFT', 'PROPOSED', 'CONFIRMED', 'CANCELLED', 'PAST']
+          $ref: "#/components/x-enums/SessionStatus"
         description:
           type: string
         participants:
@@ -359,7 +375,7 @@ paths:
     get:
       operationId: Get session details
       tags:
-        - game
+        - session
       responses:
         '200':
           description: Session details.
@@ -415,9 +431,25 @@ paths:
           description: Invalid authentication or missing authorization.
     put:
       operationId: Update invitation
-      summary: Respond to an invitation
+      summary: Respond or update response to an invitation
       tags:
         - invitation
+      parameters:
+        - name: response
+          in: query
+          schema:
+            $ref: "#/components/x-enums/InvitationResponseStatus"
+      requestBody:
+        description: Update information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                response:
+                  $ref: "#/components/schemas/Invitation/properties/response"
+                comment:
+                  $ref: "#/components/schemas/Invitation/properties/comment"
       responses:
         '204':
           description: Invitation updated with response

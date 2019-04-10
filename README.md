@@ -21,3 +21,44 @@
   - The player logs in with Firebase.
   - The player sees the session in the front and the pending invitation. The front-end calls the `GET /players/:playerId/invitations` route.
   - The player accepts the invitation via the `PUT /invitations/:invitationId ?response=CONFIRMED` route. Response could be PENDING, MAYBE, DECLINED, CONFIRMED.
+
+## Development
+
+### Structure
+
+```
+.
+├── docs
+│   ├── resources
+│   └── Output doc files (openapi.yml, etc.)
+├── src
+│   ├── controllers
+│   │   ├── games - actions related to games
+│   │   │   ├── controller errors definitions
+│   │   │   └── Controller files for use-cases. Split them into action types if necessary.
+│   │   └── invitations - actions related to session invitations
+│   │       ├── controller errors definitions
+│   │       └── Controller files for use-cases. Split them into action types if necessary.
+│   │   └── players - actions related to players
+│   │       ├── controller errors definitions
+│   │       └── Controller files for use-cases. Split them into action types if necessary.
+│   │   └── sessions - actions related to sessions
+│   │       ├── controller errors definitions
+│   │       └── Controller files for use-cases. Split them into action types if necessary.
+│   ├── middlewares
+│   │   ├── authentication.middleware.js - Middlewares for authentication.
+│   │   ├── authorizaion.middleware.js - Middlewares for permissions.
+│   │   ├── locals.middleware.js - Create request local context.
+│   │   ├── logger.middleware.js - Create request logger context, plug in on-end request log.
+│   │   └── Other Middlewares for express routers.
+│   ├── models
+│   │   └── Database models.
+│   ├── routes
+│   │   └── Express routers.
+│   ├── services
+│   │   └── Layers to interact with models. Might not be used at first, put logic in controllers.
+│   ├── utils
+│   │   └── Errors, prettifiers, etc.
+│   └── app.js
+└── README.md
+```
