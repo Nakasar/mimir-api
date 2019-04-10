@@ -2,7 +2,7 @@
 
 ## Models
 
-![Models](models.png)
+![Models](docs/resources/images/models.png)
 
 ## Use Cases
 
