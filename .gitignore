@@ -2,4 +2,7 @@
 /.idea/
 
 # CONFIG
-config.local.json
+/config/local.json
+
+# NODE
+/node_modules/

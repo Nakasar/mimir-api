@@ -78,7 +78,7 @@ app.use((err, req, res, next) => {
   }
 });
 
-app.listen(8080, err => {
+app.listen(process.env.PORT || 8080, err => {
   if (err) {
     console.error(err);
     console.info(`Could not start MIMIT API.`);
@@ -93,5 +93,5 @@ app.listen(8080, err => {
     console.info('Could not init Firebase SDK.');
   }
 
-  console.info(`[\x1b[36mINFO\x1b[0m] \x1b[32mMIMIR API running on port \x1b[36m${8080}\x1b[0m\x1b[32m.\x1b[0m`);
+  console.info(`[\x1b[36mINFO\x1b[0m] \x1b[32mMIMIR API running on port \x1b[36m${process.env.PORT || 8080}\x1b[0m\x1b[32m.\x1b[0m`);
 });

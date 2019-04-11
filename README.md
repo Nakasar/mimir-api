@@ -62,3 +62,9 @@
 │   └── app.js
 └── README.md
 ```
+
+### BUILD
+
+If you have docker installed:
+- Build docker image: `docker build -t nakasar/mimir-api .  `
+- Run container: `docker run -p 8080:80 -d --name mimir-api nakasar/mimir-api`
