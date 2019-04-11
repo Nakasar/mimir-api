@@ -3,6 +3,7 @@
 
 # CONFIG
 /config/local.json
+README.local.md
 
 # NODE
 /node_modules/
