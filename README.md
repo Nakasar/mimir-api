@@ -69,12 +69,13 @@ If you have docker installed:
 - Build docker image: `docker build -t nakasar/mimir-api .  `
 - Run container: `docker run -p 8080:80 -d --name mimir-api nakasar/mimir-api`
 
-If you want to activate let's encrypt automated certificate and if you are running on a docker enviromnemt with shared resources:
+If you want to activate let's encrypt automated certificate and if you are running on a docker enviromnemt with shared resources with docker nginx companion:
 Add the following variables to your container (and do not expose any port):
 ```
 VIRTUAL_HOST=domain.example.com
 LETSENCRYPT_HOST=domain.example.com
 LETSENCRYPT_EMAIL=your_email
+--network=webproxy 
 ```
 
- `docker run -e VIRTUAL_HOST=domain.example.com -e LETSENCRYPT_HOST=domain.example.com -e LETSENCRYPT_EMAIL=your_email -d --name mimir-api nakasar/mimir-api`
+ `docker run -e VIRTUAL_HOST=domain.example.com -e LETSENCRYPT_HOST=domain.example.com -e LETSENCRYPT_EMAIL=your_email --network=webproxy -d --name mimir-api nakasar/mimir-api`
